@@ -346,12 +346,15 @@ html {
 }
 
 .timeline-dot {
-  width: 24px;
-  height: 24px;
+  width: 55px;
+  height: 55px;
   background-color: var(--color-gold);
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: -5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .timeline-body h3,
@@ -802,8 +805,8 @@ html {
 }
 
 .skills-dot {
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
   background-color: #bca054;
   border-radius: 50%;
   flex-shrink: 0;
