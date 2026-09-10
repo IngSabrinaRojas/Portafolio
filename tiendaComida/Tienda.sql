@@ -1,0 +1,1486 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict KBqJzTOv5AHVlWFMte2BupXLIgaTU5G05W09riXmOY0pg8vKLxtXKZZDY9ltd3Q
+
+-- Dumped from database version 18.4
+-- Dumped by pg_dump version 18.4
+
+-- Started on 2026-08-19 15:24:26
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 4 (class 2615 OID 2200)
+-- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO pg_database_owner;
+
+--
+-- TOC entry 5058 (class 0 OID 0)
+-- Dependencies: 4
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 220 (class 1259 OID 34740)
+-- Name: clientes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.clientes (
+    cliente_id integer NOT NULL,
+    nombre character varying(100) NOT NULL,
+    genero character varying(20),
+    edad integer,
+    ciudad character varying(50) NOT NULL,
+    segmento_poblacion character varying(50) NOT NULL,
+    fecha_registro date DEFAULT CURRENT_DATE,
+    CONSTRAINT clientes_edad_check CHECK (((edad >= 18) AND (edad <= 75))),
+    CONSTRAINT clientes_genero_check CHECK (((genero)::text = ANY ((ARRAY['Femenino'::character varying, 'Masculino'::character varying, 'Otro'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.clientes OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 34739)
+-- Name: clientes_cliente_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.clientes_cliente_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.clientes_cliente_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5059 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: clientes_cliente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.clientes_cliente_id_seq OWNED BY public.clientes.cliente_id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 34783)
+-- Name: detalle_ventas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.detalle_ventas (
+    detalle_id integer NOT NULL,
+    venta_id integer,
+    producto_id integer,
+    cantidad integer,
+    precio_unitario numeric(10,2) NOT NULL,
+    subtotal numeric(10,2) GENERATED ALWAYS AS (((cantidad)::numeric * precio_unitario)) STORED,
+    CONSTRAINT detalle_ventas_cantidad_check CHECK ((cantidad > 0))
+);
+
+
+ALTER TABLE public.detalle_ventas OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 34782)
+-- Name: detalle_ventas_detalle_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.detalle_ventas_detalle_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.detalle_ventas_detalle_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5060 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: detalle_ventas_detalle_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.detalle_ventas_detalle_id_seq OWNED BY public.detalle_ventas.detalle_id;
+
+
+--
+-- TOC entry 222 (class 1259 OID 34754)
+-- Name: productos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.productos (
+    producto_id integer NOT NULL,
+    nombre_producto character varying(100) NOT NULL,
+    categoria character varying(50) NOT NULL,
+    precio_unitario numeric(10,2) NOT NULL,
+    stock_minimo integer DEFAULT 15,
+    CONSTRAINT productos_precio_unitario_check CHECK ((precio_unitario > (0)::numeric))
+);
+
+
+ALTER TABLE public.productos OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 34753)
+-- Name: productos_producto_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.productos_producto_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.productos_producto_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5061 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: productos_producto_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.productos_producto_id_seq OWNED BY public.productos.producto_id;
+
+
+--
+-- TOC entry 224 (class 1259 OID 34767)
+-- Name: ventas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ventas (
+    venta_id integer NOT NULL,
+    cliente_id integer,
+    fecha_venta timestamp without time zone NOT NULL,
+    monto_total numeric(10,2) DEFAULT 0.00,
+    metodo_pago character varying(30),
+    CONSTRAINT ventas_metodo_pago_check CHECK (((metodo_pago)::text = ANY ((ARRAY['Efectivo'::character varying, 'Tarjeta de Débito'::character varying, 'Tarjeta de Crédito'::character varying, 'Transferencia'::character varying, 'Pago Móvil'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.ventas OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 34766)
+-- Name: ventas_venta_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ventas_venta_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.ventas_venta_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5062 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: ventas_venta_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ventas_venta_id_seq OWNED BY public.ventas.venta_id;
+
+
+--
+-- TOC entry 4871 (class 2604 OID 34743)
+-- Name: clientes cliente_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clientes ALTER COLUMN cliente_id SET DEFAULT nextval('public.clientes_cliente_id_seq'::regclass);
+
+
+--
+-- TOC entry 4877 (class 2604 OID 34786)
+-- Name: detalle_ventas detalle_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.detalle_ventas ALTER COLUMN detalle_id SET DEFAULT nextval('public.detalle_ventas_detalle_id_seq'::regclass);
+
+
+--
+-- TOC entry 4873 (class 2604 OID 34757)
+-- Name: productos producto_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.productos ALTER COLUMN producto_id SET DEFAULT nextval('public.productos_producto_id_seq'::regclass);
+
+
+--
+-- TOC entry 4875 (class 2604 OID 34770)
+-- Name: ventas venta_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ventas ALTER COLUMN venta_id SET DEFAULT nextval('public.ventas_venta_id_seq'::regclass);
+
+
+--
+-- TOC entry 5046 (class 0 OID 34740)
+-- Dependencies: 220
+-- Data for Name: clientes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.clientes (cliente_id, nombre, genero, edad, ciudad, segmento_poblacion, fecha_registro) FROM stdin;
+1	Valeria Gómez	Femenino	22	Caracas	Joven	2026-08-19
+2	Santiago Martínez	Masculino	28	Maracaibo	Adulto Joven	2026-08-19
+3	Camila Hernández	Femenino	34	Valencia	Adulto Joven	2026-08-19
+4	Diego Rodríguez	Masculino	45	Barquisimeto	Adulto	2026-08-19
+5	Gabriela López	Femenino	19	Maracay	Joven	2026-08-19
+6	Mateo Pérez	Masculino	52	Caracas	Adulto	2026-08-19
+7	Sofia García	Femenino	61	Valencia	Senior	2026-08-19
+8	Alejandro Sánchez	Masculino	26	Maracaibo	Adulto Joven	2026-08-19
+9	Isabella Ramírez	Femenino	23	Caracas	Joven	2026-08-19
+10	Lucas Torres	Masculino	38	Barquisimeto	Adulto Joven	2026-08-19
+11	Mariana Flores	Femenino	29	Maracay	Adulto Joven	2026-08-19
+12	Daniel Díaz	Masculino	41	Valencia	Adulto	2026-08-19
+13	Victoria Vargas	Femenino	67	Caracas	Senior	2026-08-19
+14	Samuel Castro	Masculino	21	Maracaibo	Joven	2026-08-19
+15	Andrea Morales	Femenino	33	Barquisimeto	Adulto Joven	2026-08-19
+16	David Mendoza	Masculino	48	Maracay	Adulto	2026-08-19
+17	Natalia Rojas	Femenino	25	Caracas	Joven	2026-08-19
+18	Adrián Ortiz	Masculino	31	Valencia	Adulto Joven	2026-08-19
+19	Elena Silva	Femenino	58	Maracaibo	Senior	2026-08-19
+20	Sebastian Cruz	Masculino	27	Barquisimeto	Adulto Joven	2026-08-19
+21	Lucía Reyes	Femenino	36	Maracay	Adulto Joven	2026-08-19
+22	Gabriel Reyes	Masculino	20	Caracas	Joven	2026-08-19
+23	Paula Delgado	Femenino	43	Valencia	Adulto	2026-08-19
+24	Carlos Peña	Masculino	50	Maracaibo	Adulto	2026-08-19
+25	Daniela Castillo	Femenino	24	Barquisimeto	Joven	2026-08-19
+26	Joaquín Romero	Masculino	63	Maracay	Senior	2026-08-19
+27	Valery Álvarez	Femenino	30	Caracas	Adulto Joven	2026-08-19
+28	Emanuel Moreno	Masculino	35	Valencia	Adulto Joven	2026-08-19
+29	Sara Molina	Femenino	22	Maracaibo	Joven	2026-08-19
+30	Nicolás Blanco	Masculino	39	Barquisimeto	Adulto Joven	2026-08-19
+31	Samantha Suárez	Femenino	47	Maracay	Adulto	2026-08-19
+32	Jorge Domínguez	Masculino	55	Caracas	Adulto	2026-08-19
+33	Mia Guerrero	Femenino	18	Valencia	Joven	2026-08-19
+34	Matías Marín	Masculino	32	Maracaibo	Adulto Joven	2026-08-19
+35	Fernanda Núñez	Femenino	28	Barquisimeto	Adulto Joven	2026-08-19
+36	Leonardo Medina	Masculino	42	Maracay	Adulto	2026-08-19
+37	Guadalupe Iglesias	Femenino	60	Caracas	Senior	2026-08-19
+38	Esteban Cortés	Masculino	26	Valencia	Adulto Joven	2026-08-19
+39	Ximena Garrido	Femenino	31	Maracaibo	Adulto Joven	2026-08-19
+40	Gonzalo Santos	Masculino	49	Barquisimeto	Adulto	2026-08-19
+41	Carolina Lozano	Femenino	21	Maracay	Joven	2026-08-19
+42	Manuel Cano	Masculino	37	Caracas	Adulto Joven	2026-08-19
+43	Claudia Guerrero	Femenino	53	Valencia	Adulto	2026-08-19
+44	Ángel Prieto	Masculino	66	Maracaibo	Senior	2026-08-19
+45	Beatriz Calvo	Femenino	29	Barquisimeto	Adulto Joven	2026-08-19
+46	Raúl Vidal	Masculino	34	Maracay	Adulto Joven	2026-08-19
+47	Patricia Gallego	Femenino	40	Caracas	Adulto	2026-08-19
+48	Fernando León	Masculino	23	Valencia	Joven	2026-08-19
+49	Irene Márquez	Femenino	46	Maracaibo	Adulto	2026-08-19
+50	Javier Peña	Masculino	51	Barquisimeto	Adulto	2026-08-19
+\.
+
+
+--
+-- TOC entry 5052 (class 0 OID 34783)
+-- Dependencies: 226
+-- Data for Name: detalle_ventas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.detalle_ventas (detalle_id, venta_id, producto_id, cantidad, precio_unitario) FROM stdin;
+1	298	2	1	35.00
+2	192	3	3	55.00
+3	155	4	2	45.00
+4	287	5	2	25.00
+5	160	6	3	40.00
+6	194	7	1	18.00
+7	73	8	3	30.00
+8	257	9	3	12.00
+9	62	10	1	22.50
+10	49	11	2	28.00
+11	247	12	2	32.00
+12	95	13	2	8.50
+13	9	14	2	20.00
+14	195	15	3	14.00
+15	234	1	3	15.50
+16	74	2	2	35.00
+17	216	3	1	55.00
+18	51	4	2	45.00
+19	79	5	1	25.00
+20	157	6	2	40.00
+21	273	7	3	18.00
+22	170	8	3	30.00
+23	12	9	3	12.00
+24	12	10	2	22.50
+25	14	11	2	28.00
+26	188	12	3	32.00
+27	49	13	1	8.50
+28	295	14	3	20.00
+29	17	15	2	14.00
+30	282	1	3	15.50
+31	90	2	2	35.00
+32	216	3	3	55.00
+33	178	4	2	45.00
+34	29	5	1	25.00
+35	266	6	3	40.00
+36	88	7	1	18.00
+37	228	8	3	30.00
+38	7	9	3	12.00
+39	225	10	3	22.50
+40	11	11	2	28.00
+41	20	12	1	32.00
+42	283	13	1	8.50
+43	244	14	2	20.00
+44	187	15	1	14.00
+45	64	1	1	15.50
+46	59	2	3	35.00
+47	232	3	2	55.00
+48	226	4	1	45.00
+49	273	5	2	25.00
+50	107	6	3	40.00
+51	136	7	1	18.00
+52	116	8	3	30.00
+53	29	9	2	12.00
+54	277	10	2	22.50
+55	12	11	2	28.00
+56	91	12	3	32.00
+57	291	13	3	8.50
+58	283	14	3	20.00
+59	225	15	3	14.00
+60	201	1	1	15.50
+61	127	2	3	35.00
+62	65	3	3	55.00
+63	250	4	2	45.00
+64	252	5	1	25.00
+65	78	6	3	40.00
+66	90	7	1	18.00
+67	69	8	3	30.00
+68	146	9	2	12.00
+69	109	10	1	22.50
+70	104	11	2	28.00
+71	114	12	1	32.00
+72	57	13	2	8.50
+73	216	14	2	20.00
+74	213	15	3	14.00
+75	188	1	1	15.50
+76	296	2	3	35.00
+77	196	3	2	55.00
+78	163	4	2	45.00
+79	171	5	3	25.00
+80	226	6	3	40.00
+81	174	7	1	18.00
+82	284	8	3	30.00
+83	145	9	2	12.00
+84	202	10	3	22.50
+85	18	11	1	28.00
+86	206	12	1	32.00
+87	10	13	1	8.50
+88	241	14	3	20.00
+89	154	15	3	14.00
+90	134	1	2	15.50
+91	159	2	3	35.00
+92	219	3	2	55.00
+93	114	4	2	45.00
+94	19	5	3	25.00
+95	138	6	2	40.00
+96	164	7	1	18.00
+97	195	8	3	30.00
+98	13	9	2	12.00
+99	32	10	3	22.50
+100	90	11	1	28.00
+101	185	12	1	32.00
+102	188	13	3	8.50
+103	2	14	3	20.00
+104	251	15	1	14.00
+105	155	1	2	15.50
+106	4	2	2	35.00
+107	145	3	1	55.00
+108	221	4	3	45.00
+109	252	5	2	25.00
+110	135	6	2	40.00
+111	53	7	1	18.00
+112	8	8	3	30.00
+113	170	9	3	12.00
+114	213	10	2	22.50
+115	184	11	2	28.00
+116	295	12	1	32.00
+117	220	13	2	8.50
+118	226	14	2	20.00
+119	236	15	1	14.00
+120	263	1	2	15.50
+121	59	2	3	35.00
+122	64	3	2	55.00
+123	18	4	2	45.00
+124	78	5	2	25.00
+125	103	6	1	40.00
+126	60	7	1	18.00
+127	19	8	1	30.00
+128	180	9	2	12.00
+129	48	10	2	22.50
+130	185	11	1	28.00
+131	131	12	1	32.00
+132	270	13	1	8.50
+133	164	14	1	20.00
+134	41	15	2	14.00
+135	207	1	1	15.50
+136	96	2	1	35.00
+137	21	3	1	55.00
+138	154	4	3	45.00
+139	134	5	3	25.00
+140	166	6	3	40.00
+141	128	7	2	18.00
+142	181	8	1	30.00
+143	299	9	1	12.00
+144	127	10	2	22.50
+145	115	11	3	28.00
+146	144	12	2	32.00
+147	297	13	2	8.50
+148	259	14	2	20.00
+149	166	15	2	14.00
+150	32	1	2	15.50
+151	250	2	3	35.00
+152	134	3	3	55.00
+153	171	4	3	45.00
+154	8	5	1	25.00
+155	276	6	2	40.00
+156	169	7	1	18.00
+157	204	8	1	30.00
+158	146	9	3	12.00
+159	245	10	3	22.50
+160	24	11	1	28.00
+161	84	12	3	32.00
+162	146	13	1	8.50
+163	120	14	2	20.00
+164	1	15	3	14.00
+165	226	1	3	15.50
+166	84	2	1	35.00
+167	249	3	2	55.00
+168	94	4	3	45.00
+169	2	5	3	25.00
+170	222	6	2	40.00
+171	284	7	3	18.00
+172	126	8	1	30.00
+173	243	9	3	12.00
+174	66	10	3	22.50
+175	212	11	3	28.00
+176	21	12	3	32.00
+177	141	13	1	8.50
+178	166	14	2	20.00
+179	26	15	1	14.00
+180	47	1	2	15.50
+181	246	2	1	35.00
+182	91	3	2	55.00
+183	97	4	3	45.00
+184	54	5	3	25.00
+185	283	6	2	40.00
+186	273	7	2	18.00
+187	91	8	3	30.00
+188	11	9	3	12.00
+189	179	10	2	22.50
+190	287	11	1	28.00
+191	100	12	3	32.00
+192	208	13	3	8.50
+193	34	14	3	20.00
+194	151	15	3	14.00
+195	178	1	1	15.50
+196	150	2	2	35.00
+197	151	3	1	55.00
+198	96	4	3	45.00
+199	89	5	1	25.00
+200	172	6	3	40.00
+201	170	7	2	18.00
+202	174	8	1	30.00
+203	161	9	2	12.00
+204	256	10	2	22.50
+205	187	11	1	28.00
+206	12	12	3	32.00
+207	28	13	3	8.50
+208	24	14	2	20.00
+209	163	15	1	14.00
+210	242	1	2	15.50
+211	112	2	2	35.00
+212	277	3	3	55.00
+213	168	4	3	45.00
+214	276	5	2	25.00
+215	100	6	1	40.00
+216	133	7	3	18.00
+217	17	8	2	30.00
+218	15	9	1	12.00
+219	93	10	3	22.50
+220	219	11	3	28.00
+221	281	12	2	32.00
+222	284	13	1	8.50
+223	11	14	1	20.00
+224	227	15	3	14.00
+225	142	1	2	15.50
+226	62	2	1	35.00
+227	61	3	1	55.00
+228	171	4	3	45.00
+229	222	5	2	25.00
+230	136	6	3	40.00
+231	225	7	3	18.00
+232	9	8	2	30.00
+233	213	9	3	12.00
+234	239	10	2	22.50
+235	235	11	2	28.00
+236	224	12	1	32.00
+237	211	13	3	8.50
+238	295	14	3	20.00
+239	113	15	3	14.00
+240	125	1	1	15.50
+241	292	2	2	35.00
+242	280	3	1	55.00
+243	299	4	3	45.00
+244	267	5	3	25.00
+245	152	6	1	40.00
+246	255	7	3	18.00
+247	226	8	1	30.00
+248	77	9	2	12.00
+249	106	10	3	22.50
+250	128	11	1	28.00
+251	168	12	1	32.00
+252	15	13	2	8.50
+253	36	14	1	20.00
+254	198	15	3	14.00
+255	278	1	1	15.50
+256	185	2	2	35.00
+257	296	3	3	55.00
+258	211	4	1	45.00
+259	151	5	1	25.00
+260	122	6	2	40.00
+261	74	7	3	18.00
+262	270	8	1	30.00
+263	267	9	3	12.00
+264	179	10	2	22.50
+265	60	11	3	28.00
+266	183	12	3	32.00
+267	153	13	3	8.50
+268	194	14	1	20.00
+269	243	15	1	14.00
+270	281	1	2	15.50
+271	2	2	1	35.00
+272	82	3	1	55.00
+273	268	4	1	45.00
+274	244	5	2	25.00
+275	198	6	3	40.00
+276	76	7	1	18.00
+277	6	8	3	30.00
+278	200	9	1	12.00
+279	70	10	1	22.50
+280	189	11	3	28.00
+281	245	12	3	32.00
+282	135	13	1	8.50
+283	256	14	1	20.00
+284	244	15	2	14.00
+285	258	1	3	15.50
+286	144	2	2	35.00
+287	95	3	3	55.00
+288	224	4	3	45.00
+289	89	5	1	25.00
+290	298	6	2	40.00
+291	9	7	3	18.00
+292	136	8	2	30.00
+293	93	9	2	12.00
+294	54	10	1	22.50
+295	232	11	1	28.00
+296	189	12	2	32.00
+297	29	13	2	8.50
+298	102	14	1	20.00
+299	280	15	1	14.00
+300	43	1	3	15.50
+301	144	2	1	35.00
+302	174	3	1	55.00
+303	36	4	3	45.00
+304	126	5	2	25.00
+305	263	6	2	40.00
+306	132	7	3	18.00
+307	29	8	1	30.00
+308	151	9	3	12.00
+309	292	10	3	22.50
+310	49	11	3	28.00
+311	40	12	3	32.00
+312	53	13	3	8.50
+313	228	14	1	20.00
+314	91	15	2	14.00
+315	6	1	3	15.50
+316	194	2	3	35.00
+317	170	3	1	55.00
+318	213	4	2	45.00
+319	204	5	2	25.00
+320	146	6	3	40.00
+321	224	7	1	18.00
+322	118	8	1	30.00
+323	240	9	1	12.00
+324	38	10	3	22.50
+325	132	11	1	28.00
+326	189	12	3	32.00
+327	17	13	2	8.50
+328	19	14	1	20.00
+329	56	15	1	14.00
+330	37	1	3	15.50
+331	248	2	3	35.00
+332	80	3	2	55.00
+333	114	4	2	45.00
+334	190	5	3	25.00
+335	176	6	3	40.00
+336	83	7	3	18.00
+337	126	8	2	30.00
+338	48	9	1	12.00
+339	143	10	2	22.50
+340	172	11	2	28.00
+341	178	12	3	32.00
+342	188	13	2	8.50
+343	32	14	3	20.00
+344	228	15	3	14.00
+345	210	1	1	15.50
+346	287	2	2	35.00
+347	148	3	2	55.00
+348	210	4	2	45.00
+349	153	5	1	25.00
+350	163	6	2	40.00
+351	31	7	1	18.00
+352	212	8	1	30.00
+353	96	9	1	12.00
+354	111	10	3	22.50
+355	102	11	2	28.00
+356	20	12	1	32.00
+357	281	13	2	8.50
+358	281	14	1	20.00
+359	88	15	1	14.00
+360	144	1	2	15.50
+361	72	2	1	35.00
+362	170	3	1	55.00
+363	131	4	2	45.00
+364	96	5	3	25.00
+365	50	6	3	40.00
+366	216	7	2	18.00
+367	60	8	3	30.00
+368	101	9	1	12.00
+369	256	10	3	22.50
+370	166	11	2	28.00
+371	213	12	1	32.00
+372	100	13	3	8.50
+373	241	14	3	20.00
+374	109	15	3	14.00
+375	259	1	2	15.50
+376	122	2	2	35.00
+377	92	3	3	55.00
+378	202	4	1	45.00
+379	94	5	2	25.00
+380	220	6	2	40.00
+381	167	7	2	18.00
+382	150	8	2	30.00
+383	110	9	2	12.00
+384	55	10	1	22.50
+385	87	11	2	28.00
+386	50	12	2	32.00
+387	66	13	2	8.50
+388	70	14	2	20.00
+389	144	15	1	14.00
+390	174	1	3	15.50
+391	126	2	3	35.00
+392	244	3	3	55.00
+393	248	4	3	45.00
+394	126	5	2	25.00
+395	96	6	3	40.00
+396	13	7	2	18.00
+397	281	8	2	30.00
+398	152	9	3	12.00
+399	253	10	2	22.50
+400	267	11	3	28.00
+401	32	12	2	32.00
+402	180	13	2	8.50
+403	258	14	1	20.00
+404	63	15	3	14.00
+405	284	1	1	15.50
+406	99	2	1	35.00
+407	248	3	1	55.00
+408	36	4	2	45.00
+409	15	5	3	25.00
+410	213	6	3	40.00
+411	18	7	1	18.00
+412	221	8	1	30.00
+413	246	9	1	12.00
+414	290	10	2	22.50
+415	140	11	3	28.00
+416	136	12	2	32.00
+417	183	13	3	8.50
+418	283	14	3	20.00
+419	40	15	2	14.00
+420	202	1	1	15.50
+421	151	2	1	35.00
+422	135	3	1	55.00
+423	10	4	2	45.00
+424	125	5	3	25.00
+425	276	6	1	40.00
+426	215	7	2	18.00
+427	132	8	3	30.00
+428	4	9	1	12.00
+429	267	10	3	22.50
+430	70	11	2	28.00
+431	114	12	1	32.00
+432	90	13	2	8.50
+433	173	14	3	20.00
+434	259	15	1	14.00
+435	179	1	1	15.50
+436	102	2	2	35.00
+437	223	3	2	55.00
+438	217	4	1	45.00
+439	2	5	1	25.00
+440	147	6	3	40.00
+441	300	7	1	18.00
+442	115	8	3	30.00
+443	230	9	1	12.00
+444	86	10	2	22.50
+445	97	11	3	28.00
+446	278	12	3	32.00
+447	115	13	3	8.50
+448	281	14	2	20.00
+449	174	15	1	14.00
+450	210	1	1	15.50
+451	58	2	1	35.00
+452	192	3	1	55.00
+453	177	4	3	45.00
+454	136	5	2	25.00
+455	117	6	1	40.00
+456	106	7	1	18.00
+457	154	8	1	30.00
+458	100	9	3	12.00
+459	118	10	1	22.50
+460	100	11	1	28.00
+461	37	12	2	32.00
+462	35	13	2	8.50
+463	278	14	3	20.00
+464	286	15	1	14.00
+465	53	1	3	15.50
+466	162	2	3	35.00
+467	22	3	2	55.00
+468	122	4	1	45.00
+469	115	5	3	25.00
+470	60	6	2	40.00
+471	243	7	1	18.00
+472	132	8	3	30.00
+473	119	9	1	12.00
+474	216	10	2	22.50
+475	64	11	1	28.00
+476	178	12	2	32.00
+477	201	13	3	8.50
+478	205	14	1	20.00
+479	196	15	2	14.00
+480	111	1	1	15.50
+481	18	2	2	35.00
+482	7	3	1	55.00
+483	275	4	3	45.00
+484	253	5	3	25.00
+485	160	6	3	40.00
+486	135	7	1	18.00
+487	138	8	2	30.00
+488	236	9	3	12.00
+489	83	10	2	22.50
+490	94	11	2	28.00
+491	14	12	3	32.00
+492	60	13	3	8.50
+493	173	14	2	20.00
+494	193	15	3	14.00
+495	253	1	2	15.50
+496	76	2	1	35.00
+497	25	3	2	55.00
+498	156	4	3	45.00
+499	249	5	1	25.00
+500	112	6	2	40.00
+501	150	7	3	18.00
+502	137	8	1	30.00
+503	48	9	1	12.00
+504	217	10	3	22.50
+505	22	11	3	28.00
+506	225	12	1	32.00
+507	237	13	2	8.50
+508	118	14	2	20.00
+509	260	15	3	14.00
+510	233	1	3	15.50
+511	53	2	3	35.00
+512	156	3	2	55.00
+513	219	4	1	45.00
+514	292	5	2	25.00
+515	6	6	1	40.00
+516	281	7	2	18.00
+517	229	8	3	30.00
+518	255	9	2	12.00
+519	297	10	1	22.50
+520	7	11	1	28.00
+521	43	12	2	32.00
+522	184	13	3	8.50
+523	99	14	1	20.00
+524	58	15	1	14.00
+525	121	1	1	15.50
+526	201	2	1	35.00
+527	280	3	3	55.00
+528	108	4	1	45.00
+529	127	5	2	25.00
+530	110	6	1	40.00
+531	93	7	3	18.00
+532	268	8	1	30.00
+533	88	9	3	12.00
+534	105	10	1	22.50
+535	82	11	3	28.00
+536	172	12	1	32.00
+537	163	13	1	8.50
+538	129	14	2	20.00
+539	208	15	2	14.00
+540	172	1	3	15.50
+541	182	2	2	35.00
+542	103	3	1	55.00
+543	49	4	2	45.00
+544	4	5	2	25.00
+545	165	6	1	40.00
+546	167	7	3	18.00
+547	158	8	1	30.00
+548	131	9	3	12.00
+549	100	10	3	22.50
+550	212	11	1	28.00
+551	278	12	3	32.00
+552	21	13	2	8.50
+553	42	14	3	20.00
+554	202	15	1	14.00
+555	254	1	2	15.50
+556	242	2	3	35.00
+557	215	3	2	55.00
+558	68	4	1	45.00
+559	108	5	2	25.00
+560	175	6	2	40.00
+561	80	7	2	18.00
+562	234	8	3	30.00
+563	140	9	2	12.00
+564	197	10	2	22.50
+565	29	11	2	28.00
+566	202	12	2	32.00
+567	284	13	2	8.50
+568	34	14	1	20.00
+569	112	15	2	14.00
+570	242	1	3	15.50
+571	12	2	3	35.00
+572	170	3	3	55.00
+573	287	4	3	45.00
+574	297	5	3	25.00
+575	222	6	1	40.00
+576	162	7	2	18.00
+577	4	8	3	30.00
+578	101	9	1	12.00
+579	165	10	2	22.50
+580	276	11	3	28.00
+581	105	12	2	32.00
+582	249	13	2	8.50
+583	89	14	3	20.00
+584	138	15	1	14.00
+585	36	1	1	15.50
+586	290	2	1	35.00
+587	116	3	3	55.00
+588	183	4	1	45.00
+589	209	5	1	25.00
+590	262	6	2	40.00
+591	119	7	1	18.00
+592	280	8	1	30.00
+593	62	9	1	12.00
+594	255	10	1	22.50
+595	177	11	1	28.00
+596	63	12	2	32.00
+597	11	13	1	8.50
+598	182	14	1	20.00
+599	156	15	2	14.00
+600	106	1	1	15.50
+601	238	2	3	35.00
+602	297	3	1	55.00
+603	1	4	2	45.00
+604	17	5	3	25.00
+605	123	6	1	40.00
+606	31	7	2	18.00
+607	15	8	2	30.00
+608	119	9	1	12.00
+609	241	10	1	22.50
+610	272	11	2	28.00
+611	130	12	3	32.00
+612	81	13	2	8.50
+613	82	14	1	20.00
+614	84	15	2	14.00
+615	179	1	2	15.50
+616	162	2	3	35.00
+617	100	3	3	55.00
+618	95	4	1	45.00
+619	144	5	1	25.00
+620	33	6	2	40.00
+621	259	7	1	18.00
+622	89	8	1	30.00
+623	148	9	1	12.00
+624	183	10	1	22.50
+625	184	11	2	28.00
+626	154	12	2	32.00
+627	210	13	3	8.50
+628	210	14	1	20.00
+629	20	15	3	14.00
+630	82	1	2	15.50
+631	62	2	2	35.00
+632	30	3	3	55.00
+633	244	4	2	45.00
+634	1	5	1	25.00
+635	34	6	2	40.00
+636	280	7	1	18.00
+637	149	8	3	30.00
+638	156	9	2	12.00
+639	285	10	2	22.50
+640	184	11	1	28.00
+641	116	12	2	32.00
+642	136	13	3	8.50
+643	111	14	3	20.00
+644	70	15	2	14.00
+645	55	1	3	15.50
+646	178	2	1	35.00
+647	293	3	3	55.00
+648	151	4	3	45.00
+649	127	5	2	25.00
+650	166	6	1	40.00
+651	65	7	2	18.00
+652	88	8	3	30.00
+653	45	9	1	12.00
+654	223	10	1	22.50
+655	51	11	1	28.00
+656	278	12	2	32.00
+657	231	13	3	8.50
+658	114	14	1	20.00
+659	286	15	3	14.00
+660	212	1	1	15.50
+661	206	2	2	35.00
+662	192	3	3	55.00
+663	262	4	1	45.00
+664	35	5	3	25.00
+665	95	6	1	40.00
+666	120	7	3	18.00
+667	273	8	2	30.00
+668	285	9	3	12.00
+669	269	10	1	22.50
+670	119	11	3	28.00
+671	9	12	3	32.00
+672	5	13	3	8.50
+673	151	14	1	20.00
+674	267	15	3	14.00
+675	160	1	1	15.50
+676	264	2	2	35.00
+677	9	3	3	55.00
+678	247	4	1	45.00
+679	226	5	3	25.00
+680	212	6	1	40.00
+681	68	7	3	18.00
+682	220	8	2	30.00
+683	116	9	1	12.00
+684	141	10	3	22.50
+685	138	11	2	28.00
+686	162	12	1	32.00
+687	53	13	1	8.50
+688	78	14	3	20.00
+689	76	15	2	14.00
+690	17	1	2	15.50
+691	265	2	1	35.00
+692	76	3	3	55.00
+693	271	4	2	45.00
+694	201	5	1	25.00
+695	266	6	3	40.00
+696	297	7	3	18.00
+697	145	8	1	30.00
+698	189	9	1	12.00
+699	21	10	1	22.50
+700	90	11	3	28.00
+\.
+
+
+--
+-- TOC entry 5048 (class 0 OID 34754)
+-- Dependencies: 222
+-- Data for Name: productos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.productos (producto_id, nombre_producto, categoria, precio_unitario, stock_minimo) FROM stdin;
+1	Camiseta Casual Algodón	Ropa	15.50	20
+2	Jeans Slim Fit	Ropa	35.00	15
+3	Zapatillas Deportivas	Calzado	55.00	10
+4	Chaqueta Impermeable	Ropa	45.00	10
+5	Bolso Urbano	Accesorios	25.00	12
+6	Reloj Minimalista	Accesorios	40.00	8
+7	Gafas de Sol UV	Accesorios	18.00	15
+8	Perfume Floral 100ml	Cuidado Personal	30.00	10
+9	Crema Hidratante Facial	Cuidado Personal	12.00	25
+10	Sérum Facial Antioxidante	Cuidado Personal	22.50	15
+11	Set de Maquillaje Basico	Cosméticos	28.00	12
+12	Audífonos Inalámbricos	Tecnología	32.00	15
+13	Funda Protectora Soporte	Tecnología	8.50	30
+14	Sandalias de Verano	Calzado	20.00	18
+15	Cinturón de Cuero	Accesorios	14.00	20
+\.
+
+
+--
+-- TOC entry 5050 (class 0 OID 34767)
+-- Dependencies: 224
+-- Data for Name: ventas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ventas (venta_id, cliente_id, fecha_venta, monto_total, metodo_pago) FROM stdin;
+3	47	2026-08-22 00:47:47.363623	0.00	Transferencia
+16	13	2026-08-23 23:44:09.985347	0.00	Efectivo
+23	20	2026-08-03 13:12:28.174662	0.00	Transferencia
+27	34	2026-08-10 10:07:46.287209	0.00	Transferencia
+39	36	2026-08-25 22:47:26.385056	0.00	Tarjeta de Crédito
+44	27	2026-08-24 20:01:05.20927	0.00	Tarjeta de Débito
+46	30	2026-08-02 02:47:42.969308	0.00	Transferencia
+52	17	2026-08-25 21:46:16.611303	0.00	Efectivo
+67	20	2026-08-02 21:47:05.435662	0.00	Pago Móvil
+71	33	2026-08-20 09:32:02.905987	0.00	Pago Móvil
+75	8	2026-08-05 04:27:10.919998	0.00	Efectivo
+85	30	2026-08-24 06:41:00.187378	0.00	Transferencia
+98	33	2026-08-20 05:35:18.894151	0.00	Transferencia
+124	14	2026-08-19 14:04:29.29177	0.00	Pago Móvil
+139	24	2026-08-29 15:51:21.112751	0.00	Transferencia
+186	19	2026-08-05 19:05:36.802319	0.00	Efectivo
+191	5	2026-08-06 10:14:02.229105	0.00	Transferencia
+199	1	2026-08-29 16:42:11.956396	0.00	Efectivo
+203	21	2026-08-14 15:00:47.660554	0.00	Tarjeta de Débito
+214	40	2026-08-08 16:56:10.280713	0.00	Tarjeta de Débito
+218	45	2026-08-03 13:45:28.498584	0.00	Transferencia
+261	44	2026-08-20 20:27:30.917968	0.00	Tarjeta de Débito
+274	30	2026-08-18 19:50:14.668413	0.00	Pago Móvil
+279	44	2026-08-21 03:33:10.12693	0.00	Tarjeta de Débito
+288	6	2026-08-14 09:09:12.382843	0.00	Tarjeta de Débito
+289	8	2026-08-05 05:37:05.913549	0.00	Transferencia
+294	21	2026-08-08 04:37:26.754083	0.00	Tarjeta de Crédito
+1	47	2026-08-05 20:22:26.183288	157.00	Efectivo
+2	16	2026-08-10 19:07:11.736837	195.00	Pago Móvil
+4	8	2026-08-02 16:03:58.695693	222.00	Tarjeta de Débito
+5	33	2026-08-04 02:19:31.766665	25.50	Tarjeta de Crédito
+6	25	2026-08-01 18:21:55.613104	176.50	Tarjeta de Débito
+7	33	2026-08-22 06:29:39.846155	119.00	Transferencia
+8	5	2026-08-26 11:42:01.348143	115.00	Pago Móvil
+9	22	2026-08-28 05:03:35.780352	415.00	Pago Móvil
+10	47	2026-08-26 06:17:42.429703	98.50	Transferencia
+11	8	2026-08-12 12:41:53.791317	120.50	Tarjeta de Débito
+12	33	2026-08-26 17:40:12.357834	338.00	Tarjeta de Crédito
+13	39	2026-08-31 14:34:27.001406	60.00	Tarjeta de Débito
+14	31	2026-08-10 19:20:36.792561	152.00	Transferencia
+15	40	2026-08-28 01:54:13.603133	164.00	Transferencia
+17	18	2026-08-08 03:09:29.988296	211.00	Pago Móvil
+18	47	2026-08-26 13:51:03.654285	206.00	Pago Móvil
+19	43	2026-08-06 23:33:56.238599	125.00	Transferencia
+20	13	2026-08-12 22:33:03.719385	106.00	Tarjeta de Crédito
+21	9	2026-08-01 09:52:30.138795	190.50	Pago Móvil
+22	26	2026-08-26 02:05:57.976457	194.00	Pago Móvil
+24	38	2026-08-12 13:38:23.525005	68.00	Tarjeta de Crédito
+25	50	2026-08-27 09:22:13.820703	110.00	Efectivo
+26	30	2026-08-02 12:26:37.754487	14.00	Tarjeta de Crédito
+28	45	2026-08-14 22:47:54.613221	25.50	Tarjeta de Crédito
+29	6	2026-08-22 18:44:27.69236	152.00	Tarjeta de Débito
+30	40	2026-08-17 22:23:02.425202	165.00	Pago Móvil
+31	34	2026-08-08 02:31:22.454108	54.00	Transferencia
+32	7	2026-08-26 18:01:45.012705	222.50	Pago Móvil
+33	11	2026-08-25 08:31:50.280585	80.00	Tarjeta de Débito
+34	25	2026-08-28 19:40:54.480133	160.00	Transferencia
+35	31	2026-08-09 02:43:33.665017	92.00	Transferencia
+36	23	2026-08-30 02:29:02.83983	260.50	Tarjeta de Crédito
+37	12	2026-08-20 13:18:56.70425	110.50	Efectivo
+38	10	2026-08-20 15:25:07.771812	67.50	Transferencia
+40	2	2026-08-27 17:02:16.087248	124.00	Tarjeta de Débito
+41	49	2026-08-23 10:44:20.834683	28.00	Pago Móvil
+42	5	2026-08-15 06:11:31.858428	60.00	Transferencia
+43	13	2026-08-02 10:27:41.701118	110.50	Tarjeta de Débito
+45	39	2026-08-27 11:36:50.985949	12.00	Tarjeta de Débito
+47	36	2026-08-14 14:00:04.19275	31.00	Efectivo
+48	13	2026-08-20 22:29:26.621217	69.00	Pago Móvil
+49	24	2026-08-29 18:32:36.47969	238.50	Tarjeta de Débito
+50	2	2026-08-18 18:07:10.870855	184.00	Tarjeta de Crédito
+51	4	2026-08-19 23:08:14.639028	118.00	Tarjeta de Crédito
+53	15	2026-08-29 15:56:20.408159	203.50	Tarjeta de Crédito
+54	17	2026-08-17 14:12:51.1692	97.50	Pago Móvil
+55	30	2026-08-20 23:41:51.449226	69.00	Tarjeta de Crédito
+56	1	2026-08-31 12:57:20.335913	14.00	Efectivo
+57	6	2026-08-07 05:32:13.691968	17.00	Pago Móvil
+58	37	2026-08-06 08:24:26.457271	49.00	Tarjeta de Crédito
+59	7	2026-08-19 09:47:42.885782	210.00	Transferencia
+60	40	2026-08-07 00:43:21.008436	297.50	Efectivo
+61	18	2026-08-06 16:16:05.568051	55.00	Transferencia
+62	49	2026-08-04 22:51:28.455793	139.50	Pago Móvil
+63	8	2026-08-29 17:00:28.165267	106.00	Tarjeta de Débito
+64	45	2026-08-05 22:19:54.933175	153.50	Tarjeta de Débito
+65	50	2026-08-03 09:08:48.431561	201.00	Pago Móvil
+66	45	2026-08-27 15:22:09.419152	84.50	Efectivo
+68	40	2026-08-18 22:08:13.702235	99.00	Transferencia
+69	46	2026-08-23 09:33:50.201467	90.00	Tarjeta de Crédito
+70	22	2026-08-02 16:13:15.268112	146.50	Efectivo
+72	16	2026-08-12 16:11:57.411222	35.00	Pago Móvil
+73	23	2026-08-03 13:39:44.030369	90.00	Efectivo
+74	50	2026-08-05 02:43:14.354559	124.00	Tarjeta de Crédito
+76	1	2026-08-30 15:32:53.066668	246.00	Pago Móvil
+77	10	2026-08-14 11:57:57.384038	24.00	Transferencia
+78	37	2026-08-05 17:27:27.450669	230.00	Tarjeta de Débito
+79	41	2026-08-13 21:25:56.411267	25.00	Pago Móvil
+80	39	2026-08-06 18:36:53.943209	146.00	Efectivo
+81	12	2026-08-17 03:43:04.859482	17.00	Pago Móvil
+82	17	2026-08-27 00:53:25.272712	190.00	Pago Móvil
+83	25	2026-08-01 14:11:16.164786	99.00	Efectivo
+84	21	2026-08-09 01:13:47.472372	159.00	Tarjeta de Débito
+86	12	2026-08-11 04:18:11.886795	45.00	Tarjeta de Débito
+87	33	2026-08-14 02:17:00.605172	56.00	Pago Móvil
+88	30	2026-08-18 04:20:26.806015	158.00	Efectivo
+89	15	2026-08-01 18:14:46.228013	140.00	Pago Móvil
+90	42	2026-08-02 20:46:31.023482	217.00	Tarjeta de Crédito
+91	41	2026-08-11 19:29:54.719231	324.00	Tarjeta de Débito
+92	14	2026-08-23 08:47:27.751525	165.00	Transferencia
+93	42	2026-08-12 23:18:26.025233	145.50	Tarjeta de Crédito
+94	23	2026-08-18 15:49:37.324374	241.00	Efectivo
+95	10	2026-08-25 15:03:35.633979	267.00	Efectivo
+96	44	2026-08-07 15:00:26.073396	377.00	Efectivo
+97	25	2026-08-12 06:42:56.930564	219.00	Efectivo
+99	14	2026-08-11 18:03:11.705637	55.00	Tarjeta de Crédito
+100	39	2026-08-06 05:32:57.05428	458.00	Pago Móvil
+101	32	2026-08-27 10:47:05.361724	24.00	Tarjeta de Débito
+102	30	2026-08-17 09:31:27.211721	146.00	Efectivo
+103	18	2026-08-01 11:06:59.698429	95.00	Pago Móvil
+104	23	2026-08-25 03:45:08.893472	56.00	Tarjeta de Débito
+105	11	2026-08-23 14:55:43.156829	86.50	Pago Móvil
+106	33	2026-08-26 06:45:59.132425	101.00	Tarjeta de Débito
+107	28	2026-08-25 20:47:33.680044	120.00	Efectivo
+108	47	2026-08-08 07:45:40.483051	95.00	Efectivo
+109	30	2026-08-15 18:40:36.883057	64.50	Efectivo
+110	3	2026-08-22 13:00:14.35536	64.00	Tarjeta de Débito
+111	28	2026-08-26 09:26:44.348584	143.00	Tarjeta de Débito
+112	16	2026-08-01 15:08:15.50643	178.00	Efectivo
+113	45	2026-08-07 21:45:00.488725	42.00	Transferencia
+114	32	2026-08-07 14:57:15.154885	264.00	Tarjeta de Crédito
+115	46	2026-08-08 22:12:17.024783	274.50	Transferencia
+116	37	2026-08-10 15:04:29.657357	331.00	Tarjeta de Débito
+117	46	2026-08-24 23:28:02.243393	40.00	Pago Móvil
+118	8	2026-08-31 03:46:07.995917	92.50	Transferencia
+119	36	2026-08-02 14:36:49.340969	126.00	Efectivo
+120	14	2026-08-28 00:53:05.28436	94.00	Tarjeta de Crédito
+121	24	2026-08-08 21:55:27.808949	15.50	Transferencia
+122	47	2026-08-01 09:29:27.461883	195.00	Transferencia
+123	50	2026-08-19 12:58:54.828257	40.00	Tarjeta de Crédito
+125	23	2026-08-04 00:40:28.998101	90.50	Tarjeta de Débito
+126	33	2026-08-31 10:22:01.23723	295.00	Pago Móvil
+127	21	2026-08-14 19:35:47.091098	250.00	Pago Móvil
+128	8	2026-08-13 07:28:33.84668	64.00	Tarjeta de Débito
+129	12	2026-08-22 07:58:11.318415	40.00	Transferencia
+130	46	2026-08-09 01:27:10.679398	96.00	Transferencia
+131	41	2026-08-23 11:31:28.017444	158.00	Efectivo
+132	39	2026-08-15 16:24:01.076335	262.00	Tarjeta de Crédito
+133	16	2026-08-02 12:36:31.415815	54.00	Pago Móvil
+134	31	2026-08-11 10:27:40.222441	271.00	Transferencia
+135	27	2026-08-07 16:51:21.572694	161.50	Tarjeta de Débito
+136	20	2026-08-13 23:30:54.578922	337.50	Pago Móvil
+137	18	2026-08-28 11:31:19.288013	30.00	Efectivo
+138	49	2026-08-27 00:25:02.849432	210.00	Pago Móvil
+140	46	2026-08-01 21:53:43.221841	108.00	Tarjeta de Crédito
+141	50	2026-08-31 06:15:17.995527	76.00	Tarjeta de Crédito
+142	8	2026-08-09 18:14:27.617979	31.00	Pago Móvil
+143	7	2026-08-25 04:30:26.985674	45.00	Tarjeta de Crédito
+144	48	2026-08-30 04:17:07.478548	239.00	Pago Móvil
+145	43	2026-08-11 08:44:17.275551	109.00	Transferencia
+146	43	2026-08-20 14:58:26.509158	188.50	Transferencia
+147	47	2026-08-11 23:45:49.879698	120.00	Transferencia
+148	37	2026-08-16 09:45:14.06447	122.00	Efectivo
+149	25	2026-08-11 02:12:13.671451	90.00	Tarjeta de Débito
+150	12	2026-08-20 22:40:05.441751	184.00	Pago Móvil
+151	37	2026-08-29 05:26:07.706831	348.00	Transferencia
+152	1	2026-08-07 09:27:14.239619	76.00	Transferencia
+153	37	2026-08-12 00:01:17.487326	50.50	Tarjeta de Crédito
+154	17	2026-08-25 11:23:55.273832	271.00	Transferencia
+155	23	2026-08-02 14:32:58.473753	121.00	Efectivo
+156	25	2026-08-30 02:25:34.381944	297.00	Tarjeta de Crédito
+157	1	2026-08-21 14:53:49.018069	80.00	Tarjeta de Débito
+158	28	2026-08-15 06:45:26.238316	30.00	Pago Móvil
+159	18	2026-08-11 00:06:13.842785	105.00	Tarjeta de Crédito
+160	8	2026-08-26 15:51:50.339097	255.50	Efectivo
+161	2	2026-08-05 19:19:07.56701	24.00	Tarjeta de Crédito
+162	29	2026-08-21 10:58:44.820299	278.00	Transferencia
+163	41	2026-08-13 01:38:13.31696	192.50	Efectivo
+164	38	2026-08-10 09:12:15.657521	38.00	Pago Móvil
+165	7	2026-08-17 21:23:55.878488	85.00	Tarjeta de Crédito
+166	31	2026-08-22 22:32:01.985014	284.00	Tarjeta de Débito
+167	6	2026-08-24 06:04:12.923912	90.00	Tarjeta de Crédito
+168	15	2026-08-06 02:55:11.193015	167.00	Transferencia
+169	9	2026-08-16 10:04:18.151153	18.00	Tarjeta de Crédito
+170	42	2026-08-10 08:46:39.725289	437.00	Pago Móvil
+171	36	2026-08-31 01:02:54.582213	345.00	Pago Móvil
+172	12	2026-08-19 00:45:04.869097	254.50	Transferencia
+173	30	2026-08-01 19:50:53.327011	100.00	Tarjeta de Débito
+174	10	2026-08-02 22:29:00.05513	163.50	Efectivo
+175	4	2026-08-02 19:49:19.636302	80.00	Pago Móvil
+176	47	2026-08-07 04:02:02.068409	120.00	Transferencia
+177	31	2026-08-14 12:07:28.580322	163.00	Tarjeta de Crédito
+178	44	2026-08-11 13:34:29.045028	300.50	Tarjeta de Débito
+179	46	2026-08-13 07:04:19.609381	136.50	Efectivo
+180	20	2026-08-14 04:50:05.482807	41.00	Tarjeta de Débito
+181	42	2026-08-14 15:09:05.718955	30.00	Tarjeta de Débito
+182	48	2026-08-05 00:24:43.665424	90.00	Pago Móvil
+183	43	2026-08-12 07:13:20.321303	189.00	Efectivo
+184	36	2026-08-21 01:07:07.731651	165.50	Tarjeta de Crédito
+185	25	2026-08-29 18:37:17.69616	130.00	Efectivo
+187	33	2026-08-19 15:02:17.058983	42.00	Tarjeta de Crédito
+188	36	2026-08-31 07:20:35.716105	154.00	Tarjeta de Débito
+189	38	2026-08-04 11:52:05.378854	256.00	Transferencia
+190	21	2026-08-23 04:50:49.960013	75.00	Pago Móvil
+192	45	2026-08-11 19:46:43.389874	385.00	Pago Móvil
+193	10	2026-08-13 10:18:16.850312	42.00	Tarjeta de Crédito
+194	32	2026-08-22 15:53:49.191452	143.00	Efectivo
+195	42	2026-08-15 09:01:22.337479	132.00	Transferencia
+196	35	2026-08-23 12:18:50.729044	138.00	Transferencia
+197	29	2026-08-12 20:22:56.56954	45.00	Pago Móvil
+198	14	2026-08-18 22:17:13.497486	162.00	Tarjeta de Débito
+200	38	2026-08-17 07:18:27.029754	12.00	Efectivo
+201	29	2026-08-03 19:49:05.927793	101.00	Pago Móvil
+202	44	2026-08-21 12:55:58.943699	206.00	Tarjeta de Crédito
+204	23	2026-08-29 13:50:49.844317	80.00	Pago Móvil
+205	13	2026-08-06 00:37:44.257379	20.00	Transferencia
+206	20	2026-08-05 12:15:52.940679	102.00	Pago Móvil
+207	9	2026-08-02 15:31:48.608994	15.50	Transferencia
+208	16	2026-08-21 04:15:04.262571	53.50	Tarjeta de Crédito
+209	18	2026-08-24 08:06:04.409719	25.00	Efectivo
+210	10	2026-08-26 04:44:03.185049	166.50	Transferencia
+211	18	2026-08-30 15:33:43.039489	70.50	Tarjeta de Crédito
+212	36	2026-08-19 00:22:50.737488	197.50	Tarjeta de Crédito
+213	34	2026-08-28 01:18:32.566518	365.00	Efectivo
+215	12	2026-08-25 23:49:26.442373	146.00	Pago Móvil
+216	36	2026-08-03 23:08:56.604747	341.00	Tarjeta de Débito
+217	17	2026-08-29 14:53:30.521304	112.50	Efectivo
+219	32	2026-08-15 17:04:38.482466	239.00	Pago Móvil
+220	19	2026-08-18 05:02:25.32019	157.00	Tarjeta de Crédito
+221	30	2026-08-25 16:34:41.223432	165.00	Efectivo
+222	38	2026-08-29 13:10:57.21271	170.00	Tarjeta de Crédito
+223	16	2026-08-16 01:33:42.110235	132.50	Transferencia
+224	24	2026-08-08 14:34:53.840848	185.00	Pago Móvil
+225	24	2026-08-07 10:45:29.87341	195.50	Tarjeta de Crédito
+226	14	2026-08-07 23:14:45.92468	356.50	Transferencia
+227	10	2026-08-17 07:44:20.489575	42.00	Tarjeta de Crédito
+228	25	2026-08-22 15:26:54.036775	152.00	Tarjeta de Crédito
+229	29	2026-08-10 08:00:07.142973	90.00	Tarjeta de Crédito
+230	43	2026-08-16 17:50:52.342883	12.00	Pago Móvil
+231	45	2026-08-28 13:23:08.822093	25.50	Tarjeta de Débito
+232	7	2026-08-30 11:29:37.111035	138.00	Tarjeta de Débito
+233	42	2026-08-10 01:08:09.856666	46.50	Transferencia
+234	26	2026-08-21 06:27:12.337572	136.50	Pago Móvil
+235	35	2026-08-06 17:35:08.823322	56.00	Pago Móvil
+236	29	2026-08-22 15:44:30.275387	50.00	Tarjeta de Crédito
+237	1	2026-08-27 10:39:38.09895	17.00	Pago Móvil
+238	19	2026-08-21 21:57:13.261424	105.00	Pago Móvil
+239	10	2026-08-01 13:37:28.352229	45.00	Tarjeta de Débito
+240	20	2026-08-19 05:42:16.468435	12.00	Pago Móvil
+241	43	2026-08-08 00:13:21.198183	142.50	Tarjeta de Crédito
+242	39	2026-08-29 12:11:07.610692	182.50	Tarjeta de Crédito
+243	33	2026-08-13 17:37:10.526985	68.00	Pago Móvil
+244	13	2026-08-27 12:07:59.308718	373.00	Tarjeta de Débito
+245	3	2026-08-14 01:41:20.688042	163.50	Tarjeta de Crédito
+246	9	2026-08-17 16:02:47.074959	47.00	Tarjeta de Crédito
+247	36	2026-08-19 23:14:37.490528	109.00	Pago Móvil
+248	37	2026-08-06 09:26:52.66268	295.00	Efectivo
+249	38	2026-08-14 01:24:30.378662	152.00	Pago Móvil
+250	19	2026-08-10 15:47:03.80637	195.00	Efectivo
+251	6	2026-08-04 19:07:17.763579	14.00	Tarjeta de Crédito
+252	24	2026-08-19 02:18:16.092252	75.00	Transferencia
+253	11	2026-08-27 22:08:06.047134	151.00	Tarjeta de Crédito
+254	6	2026-08-08 18:58:18.490028	31.00	Efectivo
+255	20	2026-08-03 11:48:58.71007	100.50	Pago Móvil
+256	34	2026-08-20 20:36:53.896774	132.50	Tarjeta de Débito
+257	49	2026-08-20 21:46:31.737323	36.00	Tarjeta de Débito
+258	43	2026-08-15 11:53:23.743257	66.50	Tarjeta de Crédito
+259	48	2026-08-09 07:10:38.091872	103.00	Tarjeta de Débito
+260	37	2026-08-13 04:47:50.999839	42.00	Pago Móvil
+262	44	2026-08-18 02:52:50.351602	125.00	Transferencia
+263	49	2026-08-13 18:59:51.140342	111.00	Tarjeta de Débito
+264	46	2026-08-27 10:00:22.373828	70.00	Transferencia
+265	5	2026-08-29 07:02:45.984536	35.00	Pago Móvil
+266	39	2026-08-18 07:19:12.558346	240.00	Efectivo
+267	16	2026-08-06 17:50:17.196762	304.50	Efectivo
+268	4	2026-08-24 11:45:09.114049	75.00	Transferencia
+269	23	2026-08-23 19:57:54.342633	22.50	Efectivo
+270	24	2026-08-04 02:54:55.421786	38.50	Tarjeta de Crédito
+271	10	2026-08-18 06:07:39.284091	90.00	Efectivo
+272	45	2026-08-04 01:08:02.564664	56.00	Transferencia
+273	29	2026-08-10 15:34:06.325684	200.00	Transferencia
+275	14	2026-08-07 03:24:31.091007	135.00	Transferencia
+276	3	2026-08-12 19:15:50.180985	254.00	Tarjeta de Débito
+277	8	2026-08-25 07:15:21.360413	210.00	Tarjeta de Crédito
+278	9	2026-08-20 03:21:37.128888	331.50	Transferencia
+280	3	2026-08-06 10:20:45.934165	282.00	Efectivo
+281	1	2026-08-16 14:43:58.028886	268.00	Tarjeta de Crédito
+282	39	2026-08-19 02:48:00.886833	46.50	Efectivo
+283	18	2026-08-01 19:43:15.344891	208.50	Transferencia
+284	1	2026-08-21 19:35:07.445321	185.00	Transferencia
+285	12	2026-08-06 21:22:01.96434	81.00	Pago Móvil
+286	37	2026-08-08 13:22:48.328682	56.00	Efectivo
+287	16	2026-08-05 03:04:29.145412	283.00	Tarjeta de Débito
+290	45	2026-08-18 11:38:28.21861	80.00	Pago Móvil
+291	22	2026-08-04 07:00:41.137954	25.50	Transferencia
+292	2	2026-08-17 09:40:51.817012	187.50	Efectivo
+293	4	2026-08-06 16:42:34.744306	165.00	Efectivo
+295	12	2026-08-17 07:07:27.924971	152.00	Tarjeta de Crédito
+296	13	2026-08-12 22:09:50.764796	270.00	Efectivo
+297	43	2026-08-04 10:36:53.794826	223.50	Tarjeta de Crédito
+298	9	2026-08-26 03:05:30.149486	115.00	Tarjeta de Débito
+299	43	2026-08-10 23:55:25.061854	147.00	Tarjeta de Crédito
+300	40	2026-08-09 20:14:22.976729	18.00	Efectivo
+\.
+
+
+--
+-- TOC entry 5063 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: clientes_cliente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.clientes_cliente_id_seq', 50, true);
+
+
+--
+-- TOC entry 5064 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: detalle_ventas_detalle_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.detalle_ventas_detalle_id_seq', 700, true);
+
+
+--
+-- TOC entry 5065 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: productos_producto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.productos_producto_id_seq', 15, true);
+
+
+--
+-- TOC entry 5066 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: ventas_venta_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ventas_venta_id_seq', 300, true);
+
+
+--
+-- TOC entry 4885 (class 2606 OID 34752)
+-- Name: clientes clientes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clientes
+    ADD CONSTRAINT clientes_pkey PRIMARY KEY (cliente_id);
+
+
+--
+-- TOC entry 4893 (class 2606 OID 34792)
+-- Name: detalle_ventas detalle_ventas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.detalle_ventas
+    ADD CONSTRAINT detalle_ventas_pkey PRIMARY KEY (detalle_id);
+
+
+--
+-- TOC entry 4888 (class 2606 OID 34765)
+-- Name: productos productos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.productos
+    ADD CONSTRAINT productos_pkey PRIMARY KEY (producto_id);
+
+
+--
+-- TOC entry 4891 (class 2606 OID 34776)
+-- Name: ventas ventas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ventas
+    ADD CONSTRAINT ventas_pkey PRIMARY KEY (venta_id);
+
+
+--
+-- TOC entry 4886 (class 1259 OID 34804)
+-- Name: idx_clientes_demografia; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_clientes_demografia ON public.clientes USING btree (genero, segmento_poblacion);
+
+
+--
+-- TOC entry 4894 (class 1259 OID 34805)
+-- Name: idx_detalle_producto; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_detalle_producto ON public.detalle_ventas USING btree (producto_id);
+
+
+--
+-- TOC entry 4889 (class 1259 OID 34803)
+-- Name: idx_ventas_fecha; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_ventas_fecha ON public.ventas USING btree (fecha_venta);
+
+
+--
+-- TOC entry 4896 (class 2606 OID 34798)
+-- Name: detalle_ventas detalle_ventas_producto_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.detalle_ventas
+    ADD CONSTRAINT detalle_ventas_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(producto_id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4897 (class 2606 OID 34793)
+-- Name: detalle_ventas detalle_ventas_venta_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.detalle_ventas
+    ADD CONSTRAINT detalle_ventas_venta_id_fkey FOREIGN KEY (venta_id) REFERENCES public.ventas(venta_id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4895 (class 2606 OID 34777)
+-- Name: ventas ventas_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ventas
+    ADD CONSTRAINT ventas_cliente_id_fkey FOREIGN KEY (cliente_id) REFERENCES public.clientes(cliente_id) ON DELETE CASCADE;
+
+
+-- Completed on 2026-08-19 15:24:28
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict KBqJzTOv5AHVlWFMte2BupXLIgaTU5G05W09riXmOY0pg8vKLxtXKZZDY9ltd3Q
+

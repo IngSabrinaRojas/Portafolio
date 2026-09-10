@@ -42,8 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('is-visible');
-        // Si solo deseas que la animación ocurra una sola vez:
-        // observer.unobserve(entry.target);
       }
     });
   }, observerOptions);
@@ -268,20 +266,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Cerrar galería
-  document.querySelector('.modal-gallery-close').addEventListener('click', closeGallery);
+  const closeGalleryBtn = document.querySelector('.modal-gallery-close');
+  if (closeGalleryBtn) {
+    closeGalleryBtn.addEventListener('click', closeGallery);
+  }
   
-  modalGallery.addEventListener('click', (e) => {
-    if (e.target === modalGallery) {
-      closeGallery();
-    }
-  });
+  if (modalGallery) {
+    modalGallery.addEventListener('click', (e) => {
+      if (e.target === modalGallery) {
+        closeGallery();
+      }
+    });
+  }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modalGallery.classList.contains('active')) {
-      closeGallery();
-    }
-    if (modalGallery.classList.contains('active')) {
-      if (e.key === 'ArrowLeft') {
+    if (modalGallery && modalGallery.classList.contains('active')) {
+      if (e.key === 'Escape') {
+        closeGallery();
+      } else if (e.key === 'ArrowLeft') {
         galleryPrevBtn.click();
       } else if (e.key === 'ArrowRight') {
         galleryNextBtn.click();
@@ -289,6 +291,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   // ==================== FIN GALERÍA CON CARRUSEL ====================
-
-
 });

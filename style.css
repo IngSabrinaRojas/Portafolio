@@ -385,46 +385,63 @@ html {
 }
 
 /* ==========================================================================
-   SECCIÓN EXPERIENCIA / PROYECTOS
+   SECCIÓN EXPERIENCIA / PROYECTOS DESTACADOS (AJUSTADO EXACTO A LA IMAGEN)
    ========================================================================== */
 .experience-section {
   background-image: url(img/3.png);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 6rem 8%;
+  padding: 5rem 6%;
   position: relative;
+}
+
+.experience-wrapper {
+  position: relative;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
 }
 
 .experience-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2.5rem;
-  max-width: 1200px;
+  gap: 2rem;
   width: 100%;
-  margin: 0 auto;
   position: relative;
   z-index: 2;
+  padding-right: 60px;
 }
 
 .experience-header {
-  max-width: 800px;
+  max-width: 750px;
   width: 100%;
   text-align: left;
 }
 
-.experience-header .section-lead {
-  margin-top: 0.5rem;
-  max-width: 600px;
+.experience-header .section-title {
+  font-size: 2.8rem;
+  color: var(--color-primary-blue);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
+.experience-header .section-lead {
+  color: var(--color-primary-blue);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+  max-width: 650px;
+}
+
+/* Grilla en 2 Columnas */
 .experience-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem 2rem;
   width: 100%;
-  justify-items: center;
 }
 
 .experience-card {
@@ -432,73 +449,128 @@ html {
   border-radius: 12px;
   padding: 1.2rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1.2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 200px;
-  height: auto;
+  min-height: 160px;
   width: 100%;
-  max-width: 350px;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto Border Beam - Línea de luz que viaja por el borde */
+.experience-card::before,
+.experience-card::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Línea horizontal superior */
+.experience-card::before {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #BCA054, transparent);
+  animation: border-beam-horizontal 3s linear infinite;
+}
+
+/* Línea vertical derecha */
+.experience-card::after {
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #BCA054, transparent);
+  animation: border-beam-vertical 3s linear infinite;
+  animation-delay: 0.75s;
+}
+
+@keyframes border-beam-horizontal {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes border-beam-vertical {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 .experience-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
 .card-left-box {
-  width: 160px;
-  height: 130px;
+  width: 130px;
+  height: 110px;
   border-radius: 8px;
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #e6e4e0;
 }
 
 .fotoproyecto {
   background-image: url(img/Radio.png);
 }
+.fotosegundo {
+  background-image: url(tiendaComida/ti.png);
+}
+.fotoco{
+  background-image: url(img/vieja.png);
+}
 
 .card-right-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  height: 100%;
   flex-grow: 1;
   min-width: 0;
-  gap: 8px;
 }
 
 .card-right-content h4 {
   color: var(--color-primary-blue);
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.3;
-  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.3rem 0;
 }
 
 .card-right-content p {
   color: var(--color-text-dark);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   opacity: 0.85;
-  line-height: 1.4;
-  margin: 0;
+  line-height: 1.35;
+  margin: 0 0 0.8rem 0;
 }
 
 .card-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
+  height: 32px;
   padding: 0 1.2rem;
-  background-color: #bca05462;
-  color: #BCA054;
-  border: solid 1.5px var(--color-gold);
+  background-color: rgba(188, 160, 84, 0.15);
+  color: #a68a42;
+  border: 1.5px solid var(--color-gold);
   border-radius: 20px;
-  font-size: 0.9rem;
-  margin-top: auto;
+  font-size: 0.82rem;
+  font-weight: 500;
   width: fit-content;
   white-space: nowrap;
   box-sizing: border-box;
@@ -511,20 +583,43 @@ html {
   color: #ffffff;
 }
 
-.experience-vertical-line {
+/* Marco Decorativo Dorado a la Derecha */
+.experience-decorative-frame {
   position: absolute;
-  right: 4%;
-  top: 15%;
-  bottom: 15%;
-  width: 4px;
-  background-color: var(--color-gold);
-  opacity: 0.35;
-  border-radius: 2px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 120px;
+  border-top: 2px solid var(--color-gold);
+  border-right: 2px solid var(--color-gold);
+  border-bottom: 2px solid var(--color-gold);
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.decorative-pill-bar {
+  background-color: var(--color-gold);
+  padding: 1.5rem 0.4rem;
+  border-radius: 20px;
+  margin-right: -14px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.decorative-pill-bar span {
+  color: #ffffff;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  font-weight: 600;
 }
 
 /* ==========================================================================
-   SECCIÓN HABILIDADES (NUEVO DISEÑO CON LAYOUT EXACTO Y ANIMACIÓN DE SCROLL)
+   SECCIÓN HABILIDADES (NUEVO DISEÑO CON LAYOUT EXACTO Y ANIMACIÓN SCROLL)
    ========================================================================== */
 .skills-section {
   background: url(img/2.png) center/cover fixed;
@@ -569,7 +664,7 @@ html {
 .skills-img-main {
   width: 100%;
   height: 100%;
-      border: solid 2px #BCA054;
+  border: solid 2px #BCA054;
   border-radius: 190px 190px 0 0;
   background-image: url("img/1787009669636.png");
   background-size: cover;
@@ -620,7 +715,7 @@ html {
 .skills-tag-badge {
   position: absolute;
   bottom: -80px;
-    right: -100px;
+  right: -100px;
   background: #ffffff;
   color: #1c2d5a;
   padding: 14px 28px;
@@ -1223,553 +1318,61 @@ html {
 .gallery-carousel img {
   max-width: 70vw;
   max-height: 70vh;
-  border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  transition: opacity 0.3s ease;
 }
 
 .gallery-nav-btn {
-  background-color: var(--color-gold);
-  color: white;
-  border: none;
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  font-size: 1.5rem;
+  border: 2px solid rgba(214, 205, 184, 0.5);
+  background: rgba(28, 45, 90, 0.85);
+  color: #D6CDB8;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.gallery-nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(214, 205, 184, 0.3), transparent);
+  transition: left 0.5s ease;
 }
 
 .gallery-nav-btn:hover {
-  background-color: var(--color-gold-dark);
+  background: rgba(28, 45, 90, 1);
+  border-color: #D6CDB8;
   transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(214, 205, 184, 0.3);
+}
+
+.gallery-nav-btn:hover::before {
+  left: 100%;
+}
+
+.gallery-nav-btn:active {
+  transform: scale(0.95);
 }
 
 .gallery-nav-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: scale(1);
+  transform: none;
 }
 
-.gallery-indicators {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.gallery-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.gallery-indicator.active {
-  background-color: var(--color-gold);
-  transform: scale(1.2);
-}
-
-.gallery-indicator:hover {
-  background-color: rgba(255, 255, 255, 0.6);
-}
-
-/* ==========================================================================
-   MODAL CONTACTO
-   ========================================================================== */
-.contact-modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.contact-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: var(--color-primary-blue);
-}
-
-.contact-image-container {
-  width: 230px;
-  height: 250px;
-  border-radius: 120px 120px 0 0;
-  overflow: hidden;
-  background-image: url(img/1000261237.jpg);
-  background-position: center;
-  background-size: cover;
-  margin-bottom: 2.5rem;
-}
-
-.contact-links {
-  display: flex;
-  justify-content: center;
-  gap: 2.5rem;
-  width: 100%;
-}
-
-.contact-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: var(--color-primary-blue);
-  transition: transform 0.2s ease;
-}
-
-.contact-item:hover {
-  transform: translateY(-4px);
-}
-
-.contact-icon-wrapper {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.75rem;
-}
-
-.contact-email .contact-icon-wrapper {
-  background-color: #45af6a;
-}
-
-.contact-linkedin .contact-icon-wrapper {
-  background-color: #0a66c2;
-}
-
-.contact-github .contact-icon-wrapper {
-  background-color: #24292f;
-}
-
-.contact-CV .contact-icon-wrapper {
-  background-color: #c8aff9;
-}
-
-.contact-icon {
-  width: 25px;
-  height: 25px;
-  fill: #ffffff;
-}
-
-.contact-label {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-/* ==========================================================================
-   MODAL CURSOS
-   ========================================================================== */
-.courses-modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 450px;
-  margin: 0 auto;
-}
-
-.courses-modal-title {
-  color: var(--color-primary-blue);
-  font-size: 1.6rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.courses-carousel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  width: 100%;
-}
-
-.carousel-track {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: 340px;
-}
-
-.carousel-btn {
-  background-color: var(--color-gold);
-  color: #fff;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.carousel-btn:hover {
-  background-color: var(--color-gold-dark);
-  transform: scale(1.1);
-}
-
-.course-card {
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 320px;
-  min-height: 300px;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
-
-.course-card:hover {
-  box-shadow: 0 12px 30px var(--color-gold);
-}
-
-.course-thumb {
-  width: 100%;
-  height: 140px;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 0.8rem;
-}
-
-.course-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.course-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.course-title {
-  color: var(--color-primary-blue);
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-
-.course-description {
-  color: var(--color-primary-blue);
-  font-size: 0.7rem;
-  line-height: 1.3;
-  opacity: 0.85;
-  max-width: 200px;
-}
-
-.carousel-indicators {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: rgba(28, 45, 90, 0.3);
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.indicator.active {
-  background-color: var(--color-gold);
-}
-
-/* ==========================================================================
-   MEDIA QUERIES - RESPONSIVE
-   ========================================================================== */
-
-/* ----- Tablets y pantallas medianas (max-width: 1150px) ----- */
-@media (max-width: 1150px) {
-  .experience-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ----- Tablets (max-width: 900px) ----- */
-@media (max-width: 900px) {
-  .hero-container,
-  .education-container,
-  .experience-container {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .experience-header {
-    text-align: center;
-  }
-
-  .experience-header .section-lead {
-    margin: 0.5rem auto 0;
-  }
-
-  .experience-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .experience-card {
-    text-align: left;
-  }
-
-  .experience-vertical-line {
-    display: none;
-  }
-
-  .skills-custom-container {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-  }
-
-  .skills-custom-title {
-    position: relative;
-    top: 0;
-    left: 0;
-    margin-bottom: 1rem;
-  }
-
-  .skills-center-composition {
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
-  }
-
-  .skills-card-top,
-  .skills-card-bottom {
-    position: relative;
-    width: 100%;
-    max-width: 450px;
-  }
-
-  .skills-border-top,
-  .skills-border-bottom {
-    display: none;
-  }
-
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .arch-frame {
-    width: 280px;
-    height: 360px;
-  }
-
-  .timeline-item {
-    text-align: left;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
-  .footer-container {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-  }
-
-  .modal-container {
-    width: 95%;
-    max-height: 90vh;
-  }
-
-  .modal-content {
-    padding: 2rem 1.5rem;
-  }
-
-  .modal-body {
-    flex-direction: column;
-  }
-
-  .modal-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
-/* ----- Tablets (max-width: 815px) ----- */
-@media (max-width: 815px) {
-  .experience-grid{
-            grid-template-columns:1fr;
-    
-  }
-}
-/* ----- Móviles (max-width: 768px) ----- */
-@media (max-width: 768px) {
-  .tech-details {
-    text-align: left;
-  }
-}
-
-/* ----- Móviles pequeños (max-width: 550px) ----- */
-@media (max-width: 550px) {
-  .experience-grid {
-    grid-template-columns: 1fr;
-  }
-  .skills-tag-badge{
-display: none;
-  }
-  .skills-img-main{
-width: 80%;
-    height: 100%;
-    margin: auto;
-  }
-  .skills-img-secondary {
-    right: -0px;
-}
-  .experience-card {
-    flex-direction: column;
-    align-items: stretch;
-    height: auto;
-    min-height: auto;
-    gap: 1rem;
-    padding: 1.2rem;
-    text-align: center;
-    width: 100%;
-    max-width: 350px;
-  }
-
-  .card-left-box {
-    width: 100%;
-    height: 150px;
-  }
-
-  .card-right-content {
-    height: auto;
-    gap: 8px;
-    align-items: center;
-    text-align: center;
-  }
-
-  .card-pill {
-    margin: 10px auto 0;
-  }
-}
-
-
-/* ==========================================================================
-   MENÚ HAMBURGUESA RESPONSIVE
-   ========================================================================== */
-
-/* Botón hamburguesa - oculto en desktop */
-.menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 110;
-  gap: 5px;
-}
-
-.hamburger-line {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background-color: var(--color-primary-blue);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-/* Animación del botón hamburguesa cuando está activo */
-.menu-toggle.active .hamburger-line:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.menu-toggle.active .hamburger-line:nth-child(2) {
-  opacity: 0;
-  transform: translateX(-10px);
-}
-
-.menu-toggle.active .hamburger-line:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-/* Menú móvil */
-@media (max-width: 900px) {
-  .menu-toggle {
-    display: flex;
-  }
-
-  .nav-container {
-    position: relative;
-  }
-
-  .nav-links {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    background: rgba(230, 228, 224, 0.98);
-    -webkit-backdrop-filter: blur(15px);
-    backdrop-filter: blur(15px);
-    padding: 1.5rem 0;
-    margin-top: 0.5rem;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-20px);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 100;
-    gap: 0;
-  }
-
-  .nav-links.active {
-    display: flex;
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .nav-links li {
-    text-align: center;
-    padding: 0;
-  }
-
-  .nav-links a {
-    display: block;
-    padding: 1rem 2rem;
-    font-size: 1rem;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .nav-links a:hover {
-    background-color: rgba(188, 160, 84, 0.15);
-    color: var(--color-gold);
-  }
-
-  .btn-contact {
-    position: relative;
-    z-index: 110;
-  }
+.gallery-nav-btn:disabled:hover {
+  background: rgba(28, 45, 90, 0.85);
+  border-color: rgba(214, 205, 184, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
