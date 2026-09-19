@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==================== MENÚ HAMBURGUESA ====================
   const menuToggle = document.querySelector('.menu-toggle');
   const navLinks = document.querySelector('.nav-links');
+  const header = document.querySelector('.header');
 
   if (menuToggle && navLinks) {
     // Toggle del menú
@@ -30,6 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   // ==================== FIN MENÚ HAMBURGUESA ====================
+
+  // ==================== HEADER SCROLL ====================
+  if (header) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
+  // ==================== FIN HEADER SCROLL ====================
 
   // Configuración del Intersection Observer para animaciones al hacer scroll
   const observerOptions = {

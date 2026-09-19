@@ -18,30 +18,34 @@
   margin: 0;
   padding: 0;
 }
+body{
+  background-color: #E3E3E3;
+}
 
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--color-text-dark);
+  
 }
 
 /* ==========================================================================
    NAVEGACIÓN
    ========================================================================== */
 .header {
-  position: sticky;
+  position: absolute;
   top: 0;
   z-index: 100;
   padding: 1rem 5%;
-  background: rgba(204, 192, 173, 0);
-  -webkit-backdrop-filter: blur(15px);
-  backdrop-filter: blur(15px);
+  margin: auto;
+  width: 100%;
 }
-
+.menu-toggle{
+  display: none;
+}
 .nav-container {
   max-width: 1200px;
-  margin: 0 auto;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -67,14 +71,16 @@ html {
 }
 
 .btn-contact {
+   display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background-color: var(--color-gold);
   color: #fff;
-  padding: 0.6rem 1.6rem;
-  border-radius: 20px;
+  padding: 0.9rem 1.8rem;
+  border-radius: 25px;
   text-decoration: none;
-  font-size: 0.9rem;
   font-weight: 500;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
 .btn-contact:hover {
@@ -86,13 +92,13 @@ html {
    ESTRUCTURA GENERAL
    ========================================================================== */
 .section {
-  min-height: 100vh;
+  min-height: 125vh;
   padding: 4rem 8%;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
 }
 
 .section-title {
@@ -238,7 +244,7 @@ html {
    SECCIÓN HERO
    ========================================================================== */
 .hero-section {
-  background-image: url(img/Ingeniena\ De\ Sistemas.png);
+  background-image: url(img/uno.png);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -306,7 +312,7 @@ html {
    SECCIÓN EDUCACIÓN
    ========================================================================== */
 .education-section {
-  background: url(img/2.png) center/cover fixed;
+  background: url(img/dos.png) center/cover fixed;
 }
 
 .education-container {
@@ -391,7 +397,7 @@ html {
    SECCIÓN EXPERIENCIA / PROYECTOS DESTACADOS (AJUSTADO EXACTO A LA IMAGEN)
    ========================================================================== */
 .experience-section {
-  background-image: url(img/3.png);
+  background-image: url(img/cu.png);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -628,7 +634,7 @@ html {
    SECCIÓN HABILIDADES (NUEVO DISEÑO CON LAYOUT EXACTO Y ANIMACIÓN SCROLL)
    ========================================================================== */
 .skills-section {
-  background: url(img/2.png) center/cover fixed;
+  background: url(img/tre.png) center/cover fixed;
   padding: 5rem 2rem;
   display: flex;
   justify-content: center;
@@ -1570,6 +1576,13 @@ html {
 }
 /* Responsive para cursos */
 @media (max-width: 600px) {
+  .gallery-carousel img{
+       max-width: 70vw;
+        max-height: 20vh;
+  }
+  .github-icon{
+    display: none;
+  }
   .courses-modal {
     padding: 2rem 1rem;
   }
@@ -1579,9 +1592,10 @@ html {
   }
 
   .course-card {
-    width: 260px;
-    min-width: 260px;
-    height: 350px;
+            width: 20px;
+        min-width: 200px;
+        height: 350px;
+
   }
 
   .course-thumb {
@@ -1900,8 +1914,15 @@ html {
    ========================================================================== */
 @media (max-width: 900px) {
   /* Header - Menu hamburguesa */
+  .nav-container{
+    justify-content: space-between;
+  }
   .menu-toggle {
-    display: flex;
+   display: flex;
+        height: 45px;
+        width: 45px;
+        border: none;
+        background: none;
   }
 .timeline{
        
@@ -2233,11 +2254,7 @@ background-color: rgba(255, 255, 255, 0.466);
     height: 150px;
   }
 
-  /* Modal Galería */
-  .gallery-carousel img {
-    max-width: 85vw;
-    max-height: 60vh;
-  }
+ 
 
   .gallery-nav-btn {
     width: 40px;
